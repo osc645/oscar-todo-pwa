@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+<title>Daily Todo</title>
+<meta name="description" content="Offline-first daily to-do list that syncs into Obsidian." />
+
+<link rel="manifest" href="manifest.webmanifest" />
+<meta name="theme-color" content="#4f46e5" />
+
+<!-- iOS home screen behavior -->
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Todo" />
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+<link rel="icon" href="icons/favicon-32.png" sizes="32x32" />
+
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<div id="app">
+
+  <header class="topbar">
+    <div class="topbar-title">
+      <h1 id="dateHeading">Today</h1>
+      <p id="dateSub"></p>
+    </div>
+    <button id="syncDot" class="sync-dot" title="Sync status" aria-label="Sync status"></button>
+    <button id="settingsBtn" class="icon-btn" aria-label="Settings">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3"></circle>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+      </svg>
+    </button>
+  </header>
+
+  <main id="listArea" class="list-area">
+    <ul id="taskList" class="task-list"></ul>
+
+    <button id="completedToggle" class="completed-toggle" hidden></button>
+    <ul id="completedList" class="task-list completed-list" hidden></ul>
+
+    <div id="emptyState" class="empty-state" hidden>
+      <p>Nothing on your list yet.</p>
+      <p class="empty-sub">Add your first task below.</p>
+    </div>
+  </main>
+
+  <form id="addForm" class="add-bar">
+    <input id="addInput" type="text" placeholder="Add a task…" autocomplete="off" autocapitalize="sentences" enterkeyhint="done" maxlength="280" />
+    <button type="submit" class="add-btn" aria-label="Add task">
+      <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="12" y1="5" x2="12" y2="19"></line>
+        <line x1="5" y1="12" x2="19" y2="12"></line>
+      </svg>
+    </button>
+  </form>
+
+</div>
+
+<!-- Settings overlay -->
+<div id="settingsOverlay" class="overlay" hidden>
+  <div class="sheet">
+    <div class="sheet-header">
+      <h2>Settings</h2>
+      <button id="closeSettings" class="icon-btn" aria-label="Close">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <div class="sheet-body">
+      <section class="settings-section">
+        <h3>Obsidian sync</h3>
+        <p class="settings-hint">
+          Points at the <strong>Local REST API</strong> plugin running inside Obsidian on your Mac.
+          Works over your home wifi, or anywhere if you've set up Tailscale.
+        </p>
+
+        <label class="field-label" for="obsidianUrl">Base URL</label>
+        <input id="obsidianUrl" class="field-input" type="url" placeholder="https://your-mac.tailxxxx.ts.net:27124" autocapitalize="off" autocorrect="off" spellcheck="false" autocomplete="off" />
+
+        <label class="field-label" for="apiKey">API key</label>
+        <div class="field-with-toggle">
+          <input id="apiKey" class="field-input" type="password" placeholder="Paste from Obsidian → Local REST API settings" autocapitalize="off" autocorrect="off" spellcheck="false" autocomplete="off" />
+          <button type="button" id="toggleKeyVisibility" class="text-btn">Show</button>
+        </div>
+
+        <div class="settings-actions">
+          <button id="testConnectionBtn" class="btn btn-secondary">Test connection</button>
+          <button id="syncNowBtn" class="btn btn-primary">Sync now</button>
+        </div>
+
+        <p id="connectionStatus" class="connection-status"></p>
+
+        <div class="sync-meta">
+          <span id="lastSyncedText">Never synced</span>
+          <span id="pendingCountText"></span>
+        </div>
+      </section>
+
+      <section class="settings-section">
+        <h3>About this app</h3>
+        <p class="settings-hint">
+          Tasks are always saved on this device first — adding, checking off, and deleting
+          all work fully offline. When a connection to Obsidian is available, new and completed
+          tasks are appended into a "Tasks (from phone)" section of today's daily note.
+        </p>
+      </section>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
