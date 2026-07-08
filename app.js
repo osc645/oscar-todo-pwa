@@ -398,7 +398,7 @@
     try {
       const res = await fetchWithTimeout(`${baseUrl}/`, {
         headers: apiKey ? { Authorization: `Bearer ${apiKey}` } : {},
-      }, 6000);
+      }, 15000);
       const data = await res.json();
       if (data.authenticated) {
         connectionStatusEl.textContent = `Connected — Obsidian ${data.versions?.obsidian || ''} ✓`;
@@ -482,7 +482,7 @@
           'Content-Type': 'text/markdown',
         },
         body: `\n${body}`,
-      }, 8000);
+      }, 15000);
 
       if (!res.ok) {
         res = await fetchWithTimeout(`${baseUrl}/periodic/daily/`, {
@@ -492,7 +492,7 @@
             'Content-Type': 'text/markdown',
           },
           body: `\n## ${HEADING}\n${body}\n`,
-        }, 8000);
+        }, 15000);
       }
 
       if (!res.ok) {
