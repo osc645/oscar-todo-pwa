@@ -481,7 +481,7 @@
           Target: encodeURIComponent(HEADING),
           'Content-Type': 'text/markdown',
         },
-        body,
+        body: `\n${body}`,
       }, 8000);
 
       if (!res.ok) {
